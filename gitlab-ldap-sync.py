@@ -82,17 +82,13 @@ if __name__ == "__main__":
             logging.info('Getting all groups from LDAP.')
             ldap_groups = []
             ldap_groups_names = []
-            if not config['ldap']['group_attribute'] and not config['ldap']['group_prefix']:
-                filterstr = '(objectClass=group)'
+            if not config['ldap']['parent_group'] and not config['ldap']['group_prefix']:
+                logging.error('You should set either "parent_group" or "group_prefix" in config.json')
+                sys.exit(1)
             else:
-                if config['ldap']['group_attribute'] and config['ldap']['group_prefix']:
-                    logging.error('You should set "group_attribute" or "group_prefix" but not both in config.json')
-                    sys.exit(1)
-                else:
-                    if config['ldap']['group_attribute']:
-                        filterstr = '(&(objectClass=group)(%s=gitlab_sync))' % config['ldap']['group_attribute']
-                    if config['ldap']['group_prefix']:
-                        filterstr = '(&(objectClass=group)(cn=%s*))' % config['ldap']['group_prefix']
+                memberof = '(memberof=%s)'if config['ldap']['parent_group'] else ''
+                group_prefix = '(CN=%s*)' if config['ldap']['group_prefix'] else ''
+                filterstr = '(&(objectClass=group)%s%s)' % memberof, group_prefix
             attrlist=['name', 'member']
             if config['gitlab']['add_description']:
                 attrlist.append('description')

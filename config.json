@@ -18,7 +18,7 @@
     "user_filter": "",
     "bind_dn": "",
     "password": "",
-    "group_attribute": "",
+    "parent_group": "",
     "group_prefix": ""
   }
 }
